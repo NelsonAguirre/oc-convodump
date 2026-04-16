@@ -632,19 +632,8 @@ async function fetchSessionSnapshot(ctx: UnknownRecord, sessionID: string): Prom
 }
 
 function resolveOutputRoot(ctx: UnknownRecord, session: UnknownRecord): string {
-  const sessionWorktree = asString(session.worktree, "")
-  if (sessionWorktree && sessionWorktree !== "/") return sessionWorktree
-
-  const ctxWorktree = asString(ctx.worktree, "")
-  if (ctxWorktree && ctxWorktree !== "/") return ctxWorktree
-
-  const sessionDirectory = asString(session.directory, "")
-  if (sessionDirectory) return sessionDirectory
-
-  const ctxDirectory = asString(ctx.directory, "")
-  if (ctxDirectory) return ctxDirectory
-
-  return process.cwd()
+  const home = process.env.HOME ?? process.env.USERPROFILE ?? "/home/nelson"
+  return path.join(home, ".opencode-convos")
 }
 
 function resolveOutputPath(snapshot: SessionSnapshot, outputRoot: string): string {
@@ -654,7 +643,7 @@ function resolveOutputPath(snapshot: SessionSnapshot, outputRoot: string): strin
   const timestamp = formatFilenameTimestamp(created)
   const id = sanitiseFilename(asString(session.id, "unknown-session"))
 
-  return path.join(outputRoot, "convos", `${timestamp}-${id}.md`)
+  return path.join(outputRoot, `${timestamp}-${id}.md`)
 }
 
 async function logEvent(ctx: UnknownRecord, level: string, message: string, extra: UnknownRecord = {}): Promise<void> {
