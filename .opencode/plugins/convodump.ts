@@ -332,6 +332,7 @@ function buildFrontmatter(session: UnknownRecord): UnknownRecord {
     session_id: session.id ?? null,
     title: session.title ?? null,
     directory: session.directory ?? null,
+    agent: session.agent ?? null,
     created_at: toISO(time.created ?? session.createdAt ?? session.created_at),
     updated_at: toISO(time.updated ?? session.updatedAt ?? session.updated_at),
   }
