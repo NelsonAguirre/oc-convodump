@@ -325,14 +325,24 @@ function getMessageRole(message: unknown): string {
   return asString(role, "unknown")
 }
 
-function buildFrontmatter(session: UnknownRecord): UnknownRecord {
+function buildFrontmatter(session: UnknownRecord, messages: unknown[]): UnknownRecord {
   const time = asObject(session.time)
+
+  let agent: string | null = null
+  for (const msg of messages) {
+    const m = asObject(msg)
+    const info = asObject(m.info)
+    if (info.agent && typeof info.agent === "string") {
+      agent = info.agent
+      break
+    }
+  }
 
   return {
     session_id: session.id ?? null,
     title: session.title ?? null,
     directory: session.directory ?? null,
-    agent: session.agent ?? null,
+    agent: agent,
     created_at: toISO(time.created ?? session.createdAt ?? session.created_at),
     updated_at: toISO(time.updated ?? session.updatedAt ?? session.updated_at),
   }
@@ -552,7 +562,7 @@ function renderMarkdown(snapshot: SessionSnapshot, trigger: string, ctx: Unknown
   void trigger
   void ctx
 
-  const frontmatter = buildFrontmatter(session)
+  const frontmatter = buildFrontmatter(session, snapshot.messages)
 
   const content: string[] = []
   content.push("---")
